@@ -55,6 +55,7 @@ import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 
@@ -272,8 +273,9 @@ public class BandHeartRateAppActivity extends Activity {
         btnStart.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                int index = radioGroup.indexOfChild(radioGroup.findViewById(radioGroup.getCheckedRadioButtonId())) + 1;
 
-                new FakeSleepCycleStart().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,radioGroup.getCheckedRadioButtonId());
+                new FakeSleepCycleStart().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,index);
             }
         });
 
@@ -281,8 +283,8 @@ public class BandHeartRateAppActivity extends Activity {
         btnEnd.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                radioGroup.getCheckedRadioButtonId();
-                new FakeSleepCycleEnd().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,radioGroup.getCheckedRadioButtonId());
+                int index = radioGroup.indexOfChild(radioGroup.findViewById(radioGroup.getCheckedRadioButtonId())) + 1;
+                new FakeSleepCycleEnd().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,index);
             }
         });
 
@@ -290,8 +292,8 @@ public class BandHeartRateAppActivity extends Activity {
         btnEmergency.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                radioGroup.getCheckedRadioButtonId();
-                new TriggerEmergency().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,radioGroup.getCheckedRadioButtonId());
+                int index = radioGroup.indexOfChild(radioGroup.findViewById(radioGroup.getCheckedRadioButtonId())) + 1;
+                new TriggerEmergency().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,index);
             }
         });
 
@@ -589,9 +591,9 @@ public class BandHeartRateAppActivity extends Activity {
                         is, "UTF-8"));
 
                 while ((line = r1.readLine()) != null) {
-                    sb.append(line).append("\n");
-                    JSONObject answer = new JSONObject(line);
-                    currentSleepCycleId = Integer.parseInt(answer.get("patientId").toString());
+                    sb.append(line);
+                    JSONArray answer = new JSONArray(line);
+                    currentSleepCycleId = Integer.parseInt(answer.getJSONObject(0).get("id").toString());
                 }
             } finally {
                 is.close();
