@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -57,6 +58,8 @@ import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import io.socket.client.IO;
 
 
 public class BandHeartRateAppActivity extends Activity {
@@ -144,7 +147,7 @@ public class BandHeartRateAppActivity extends Activity {
 
                 try {
 
-                    String json = "value=" + event.getHeartRate() + "&" + "patientId=" + "1" + "&" + "date=" + sdf.format(now);
+                    String json = "value=" + event.getHeartRate() + "&" + "patientId=" + (radioGroup.indexOfChild(radioGroup.findViewById(radioGroup.getCheckedRadioButtonId())) + 1) + "&" + "date=" + sdf.format(now);
 
                     byte[] postData = json.getBytes("UTF-8");
                     int postDataLength = postData.length;
@@ -353,7 +356,7 @@ public class BandHeartRateAppActivity extends Activity {
                                 ++currentGyrTrackTimeCycle;
                             }
 
-                            Thread.sleep(10000);
+                            Thread.sleep(60000);
 
 
                             client.getSensorManager().registerHeartRateEventListener(mHeartRateEventListener);
@@ -557,9 +560,12 @@ public class BandHeartRateAppActivity extends Activity {
         @Override
         protected Void doInBackground(Integer... params) {
             try {
-                Socket socket = new Socket("smartcare.mi.hdm-stuttgart.de", 8080);
-                appendToUI(socket.getRemoteSocketAddress().toString());   }
-            catch(IOException ex)
+                io.socket.client.Socket socket = IO.socket("http://smartcare.mi.hdm-stuttgart.de:8080");
+               socket.connect();
+                String message = "Notruf!";
+                socket.emit("notification", message);
+            }
+            catch(URISyntaxException ex)
             {ex.printStackTrace();}
             return null;
         }
